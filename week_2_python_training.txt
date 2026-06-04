@@ -1,0 +1,152 @@
+1.When would you use a set instead of a list? Give two real-world examples where sets are the better choice.
+
+	visited_users = set()
+
+	visited_users.add("user123")
+	visited_users.add("user456")
+	visited_users.add("user123")  # Duplicate
+
+	print(len(visited_users))  # 2
+	
+	Duplicate user IDs are automatically ignored.
+	Fast lookup to check whether a user has already visited.
+	
+2.What is the time complexity of checking if an element exists in: (a) a list, (b) a set, (c) a dictionary? Why are they different?
+	
+	a) List → O(n)
+
+		Lists store elements sequentially. To find an element, Python may need to check each item one by one until it finds a match or reaches the end.
+
+		nums = [3, 1, 4, 1, 5]
+		print(5 in nums)
+
+		Worst case: The element is not present, so all n elements are checked.
+
+	(b) Set → O(1) Average
+
+		Sets are implemented using a hash table. Python computes a hash value for the element and directly locates the corresponding bucket.
+
+		ids = {1, 2, 3, 4}
+		print(3 in ids)
+
+		Average case: Direct lookup, so constant time.
+
+	(c) Dictionary → O(1) Average
+
+		Dictionaries also use a hash table. When checking for a key, Python hashes the key and directly finds its location.
+
+		user = {"name": "Alice", "age": 30}
+		print("name" in user)
+
+		Average case: Constant-time lookup.
+		
+3.Write a function using Counter that finds the most common character in a string and returns it with its count.
+
+	from collections import Counter
+
+	def most_common_char(text):
+		if not text:
+			return None, 0
+
+		counter = Counter(text)
+		char, count = counter.most_common(1)[0]
+		return char, count
+
+	# Example
+	result = most_common_char("mississippi")
+	print(result)  # ('i', 4)
+	
+4.Given two lists of user IDs, write a function that returns IDs present in both lists. What is the most efficient approach?
+
+	def common_user_ids(list1, list2):
+		return list(set(list1) & set(list2))
+
+	# Example
+	users_a = [101, 102, 103, 104]
+	users_b = [103, 104, 105, 106]
+
+	print(common_user_ids(users_a, users_b))
+	# [103, 104]
+	
+5.Why is deque preferred over list for implementing a queue? What specific operation makes the difference?
+
+	deque (Double-Ended Queue) is preferred over a Python list for implementing a queue because it provides O(1) time complexity for adding and removing elements from both ends.
+
+	The Key Difference
+
+	For a queue, the most common operations are:
+
+		Enqueue (add to the end)
+		Dequeue (remove from the front)
+		
+	Using a List
+	
+		queue = [1, 2, 3]
+		queue.append(4)   # O(1)
+		queue.pop(0)      # O(n)
+
+	pop(0) is O(n) because all remaining elements must be shifted one position to the left.
+
+	Using a Deque
+		from collections import deque
+
+		queue = deque([1, 2, 3])
+		queue.append(4)    # O(1)
+		queue.popleft()    # O(1)
+
+	popleft() is O(1) because deque is designed for efficient insertions and deletions at both ends.
+	
+6.Write a function that groups a list of words by their first letter using defaultdict. Example: ['apple','avocado','banana'] → {'a':['apple','avocado'], 'b':['banana']}
+
+	from collections import defaultdict
+
+	def group_by_first_letter(words):
+		grouped = defaultdict(list)
+
+		for word in words:
+			grouped[word[0]].append(word)
+
+		return dict(grouped)
+
+	# Example
+	words = ['apple', 'avocado', 'banana']
+	print(group_by_first_letter(words))
+	
+	{'a': ['apple', 'avocado'], 'b': ['banana']}
+	
+7.What happens when you use a mutable object (like a list) as a dictionary key? Why?
+
+	You cannot use a mutable object like a list as a dictionary key. Python will raise a TypeError.
+
+	Example:
+		my_dict = {}
+		my_dict[[1, 2, 3]] = "value"
+
+	Output:
+
+		TypeError: unhashable type: 'list'
+		
+	Why?
+
+		Dictionary keys must be hashable, which means:
+
+		- They have a hash value (__hash__()).
+		- Their value does not change during their lifetime.
+		
+8.Write a function that removes all duplicates from a list while preserving the original order of first occurrences.
+
+	def remove_duplicates(items):
+		seen = set()
+		result = []
+
+		for item in items:
+			if item not in seen:
+				seen.add(item)
+				result.append(item)
+
+		return result
+
+	# Example
+	nums = [3, 1, 4, 1, 5, 3, 2, 4]
+	print(remove_duplicates(nums))
+	# Output: [3, 1, 4, 5, 2]
