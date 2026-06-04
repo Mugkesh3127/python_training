@@ -1,0 +1,97 @@
+1.What is the time complexity of accessing the 5th element of a Python list? Explain why.
+
+	The time complexity of accessing the 5th element of a Python list is O(1) (Constant Time).
+	
+	Python lists are implemented as dynamic arrays, which allow direct access to elements using their index.
+	When accessing the 5th element (arr[4]), Python calculates its memory location directly without traversing the list.
+	Therefore, the time taken remains the same regardless of the size of the list.
+	
+2.Analyze this code and state its Big O:
+
+	def mystery(n):
+		for i in range(n):
+			for j in range(n):
+				print(i + j)
+				
+	- Big O Complexity: O(n²)
+	- The outer loop runs n times.
+	- For each iteration of the outer loop, the inner loop also runs n times.
+	- Therefore, the statement print(i + j) executes n × n = n² times.
+	
+	Time Complexity: O(n²) (Quadratic),
+	Space Complexity: O(1) (Constant extra space, excluding output).
+	
+3.Given a sorted array of 1 million elements, how many steps (maximum) does binary search need? Show your calculation.
+
+	- Binary search has a time complexity of O(log₂ n).
+	- For an array with 1,000,000 elements:
+		log2(1,000,000)≈19.93
+	- Since binary search may require one more comparison to finish, we take the ceiling value:
+		⌈19.93⌉=20
+		
+4.Write a function that checks if a string is a palindrome. What is its time complexity? What is its space complexity?
+
+	def is_palindrome(s):
+		return s == s[::-1]
+		
+	- s[::-1] creates a new reversed string of length n.
+	- Therefore, the Space Complexity = O(n).
+	
+5.Rank these from fastest to slowest: O(n!), O(2^n), O(n log n), O(1), O(n^2), O(log n), O(n)
+
+	O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)
+
+6.Rewrite this O(n²) duplicate-check to O(n) using a different data structure:
+
+	def has_dup(arr):
+		for i in range(len(arr)):
+			for j in range(i+1, len(arr)):
+				if arr[i] == arr[j]: return True
+		return False
+		
+	Time Complexity: O(n) (one pass through the array, O(1) average-time set operations)
+	Space Complexity: O(n) (the set may store up to n elements)
+
+	Use a set to track previously seen elements, reducing the duplicate check from O(n²) to O(n) time.
+		
+	def has_dup(arr):
+		seen = set()
+
+		for item in arr:
+			if item in seen:
+				return True
+			seen.add(item)
+
+		return False
+
+7.What is the space complexity of merge sort? Why does it differ from quick sort?
+		
+	Merge Sort Space Complexity
+	Space Complexity: O(n)
+	Merge Sort requires an additional temporary array to store elements while merging the divided subarrays back together.
+	Since the temporary storage can hold up to n elements, the extra space required is O(n).
+	Why It Differs from Quick Sort
+
+	Quick Sort
+
+	Space Complexity: O(log n) on average (due to the recursion stack).
+	Quick Sort sorts the array in place by partitioning around a pivot.
+	It does not require an additional array for merging.
+
+	Merge Sort
+
+	Requires extra memory for the merge operation.
+	Elements are copied into temporary arrays and then merged back into the original array.
+	
+8.If an O(n) algorithm takes 5ms for n=1000, approximately how long will an O(n²) algorithm take for the same input?
+
+	For the same input size (n = 1000):
+
+	An O(n) algorithm performs work proportional to n.
+	An O(n²) algorithm performs work proportional to n².
+
+	Assuming the constants are similar:
+
+	Factor increase=n2n=n=1000
+	Time=5 ms×1000=5000 ms
+	5000 ms =5 seconds
