@@ -1,0 +1,915 @@
+1.Implement a complete LinkedList class with: append, prepend, delete_by_value, search, and print_list methods. Test each method.
+
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+
+	class LinkedList:
+		def __init__(self):
+			self.head = None
+
+		# Add node at the end
+		def append(self, value):
+			new_node = ListNode(value)
+
+			if not self.head:
+				self.head = new_node
+				return
+
+			curr = self.head
+			while curr.next:
+				curr = curr.next
+
+			curr.next = new_node
+
+		# Add node at the beginning
+		def prepend(self, value):
+			self.head = ListNode(value, self.head)
+
+		# Delete first occurrence of value
+		def delete_by_value(self, value):
+			if not self.head:
+				return False
+
+			# Delete head node
+			if self.head.val == value:
+				self.head = self.head.next
+				return True
+
+			curr = self.head
+
+			while curr.next:
+				if curr.next.val == value:
+					curr.next = curr.next.next
+					return True
+				curr = curr.next
+
+			return False
+
+		# Search for a value
+		def search(self, value):
+			curr = self.head
+
+			while curr:
+				if curr.val == value:
+					return True
+				curr = curr.next
+
+			return False
+
+		# Print linked list
+		def print_list(self):
+			curr = self.head
+			values = []
+
+			while curr:
+				values.append(str(curr.val))
+				curr = curr.next
+
+			print(" -> ".join(values) if values else "Empty List")
+			
+	Testing All Methods
+		# Create linked list
+		ll = LinkedList()
+
+		# Test append
+		ll.append(10)
+		ll.append(20)
+		ll.append(30)
+
+		print("After append:")
+		ll.print_list()
+		# 10 -> 20 -> 30
+
+		# Test prepend
+		ll.prepend(5)
+
+		print("\nAfter prepend:")
+		ll.print_list()
+		# 5 -> 10 -> 20 -> 30
+
+		# Test search
+		print("\nSearch 20:", ll.search(20))
+		print("Search 100:", ll.search(100))
+
+		# Test delete_by_value
+		ll.delete_by_value(20)
+
+		print("\nAfter deleting 20:")
+		ll.print_list()
+		# 5 -> 10 -> 30
+
+		# Delete head
+		ll.delete_by_value(5)
+
+		print("\nAfter deleting 5:")
+		ll.print_list()
+		# 10 -> 30
+
+		# Delete non-existent value
+		print("\nDelete 100:", ll.delete_by_value(100))
+
+		# Final list
+		print("\nFinal List:")
+		ll.print_list()
+		
+	Expected Output
+		After append:
+		10 -> 20 -> 30
+
+		After prepend:
+		5 -> 10 -> 20 -> 30
+
+		Search 20: True
+		Search 100: False
+
+		After deleting 20:
+		5 -> 10 -> 30
+
+		After deleting 5:
+		10 -> 30
+
+		Delete 100: False
+
+		Final List:
+		10 -> 30
+		
+	Complexity Analysis
+		Method	Time Complexity	Space Complexity
+		append	O(n)	O(1)
+		prepend	O(1)	O(1)
+		delete_by_value	O(n)	O(1)
+		search	O(n)	O(1)
+		print_list	O(n)	O(n)*
+		
+		*print_list() uses a temporary list to format the output. Without storing values first, it can be implemented in O(1) extra space.
+		
+2.Write a function to reverse a linked list iteratively. Trace through the algorithm step by step for the list 1→2→3→4.
+
+	Iterative Linked List Reversal
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def reverse_list(head):
+		prev = None
+		curr = head
+
+		while curr:
+			nxt = curr.next      # Save next node
+			curr.next = prev     # Reverse pointer
+			prev = curr          # Move prev forward
+			curr = nxt           # Move curr forward
+
+		return prev
+		
+	Trace for 1 → 2 → 3 → 4
+	Initial State
+		prev = None
+		curr = 1 → 2 → 3 → 4
+		
+	Iteration 1
+	nxt = 2
+
+	1.next = None
+
+	prev = 1
+	curr = 2
+
+	Result:
+
+	Reversed: 1 → None
+
+	Remaining:
+	2 → 3 → 4
+	
+		Iteration 2
+		nxt = 3
+
+		2.next = 1
+
+		prev = 2
+		curr = 3
+
+		Result:
+
+		Reversed:
+		2 → 1 → None
+
+	Remaining:
+		3 → 4
+		Iteration 3
+		nxt = 4
+
+		3.next = 2
+
+		prev = 3
+		curr = 4
+
+		Result:
+
+		Reversed:
+		3 → 2 → 1 → None
+
+	Remaining:4
+		Iteration 4
+		nxt = None
+
+		4.next = 3
+
+		prev = 4
+		curr = None
+
+		Result:
+
+		4 → 3 → 2 → 1 → None
+		
+	Loop Ends
+		curr = None
+
+	Return:
+
+		prev = 4
+
+	which is the new head of the reversed list.
+
+	Visualization
+	Original:
+		1 → 2 → 3 → 4 → None
+
+	Step 1:
+		1 → None      2 → 3 → 4
+
+	Step 2:
+		2 → 1 → None      3 → 4
+
+	Step 3:
+		3 → 2 → 1 → None      4
+
+	Step 4:
+		4 → 3 → 2 → 1 → None
+		
+	Complexity Analysis
+		Time Complexity: O(n)
+			Each node is visited exactly once.
+		Space Complexity: O(1)
+			Only three pointers (prev, curr, nxt) are used.
+
+	For the list:
+
+		1 → 2 → 3 → 4
+
+	the reversed list is:
+
+		4 → 3 → 2 → 1
+
+	with O(n) time complexity and O(1) extra space.
+	
+3.Implement Floyd's Cycle Detection algorithm. Explain why the fast pointer moves 2 steps and the slow pointer moves 1 step.
+
+	Floyd's Cycle Detection Algorithm (Tortoise and Hare)
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def has_cycle(head):
+		slow = head
+		fast = head
+
+		while fast and fast.next:
+			slow = slow.next          # Move 1 step
+			fast = fast.next.next     # Move 2 steps
+
+			if slow == fast:
+				return True
+
+		return False
+		
+	Example Usage
+		# Create: 1 -> 2 -> 3 -> 4 -> 2 (cycle)
+		n1 = ListNode(1)
+		n2 = ListNode(2)
+		n3 = ListNode(3)
+		n4 = ListNode(4)
+
+		n1.next = n2
+		n2.next = n3
+		n3.next = n4
+		n4.next = n2
+
+		print(has_cycle(n1))  # True
+		
+	Why Does It Work?
+
+	The algorithm uses two pointers:
+
+		Slow pointer moves 1 step at a time.
+		Fast pointer moves 2 steps at a time.
+		
+	Case 1: No Cycle
+		1 → 2 → 3 → 4 → None
+
+		The fast pointer reaches None first, and the loop ends.
+
+		Result: No cycle
+
+	Case 2: Cycle Exists
+		1 → 2 → 3 → 4
+			↑       ↓
+			← ← ← ←
+
+	Suppose:
+
+		Step 0:
+		slow = 1
+		fast = 1
+
+		Step 1:
+		slow = 2
+		fast = 3
+
+		Step 2:
+		slow = 3
+		fast = 2
+
+		Step 3:
+		slow = 4
+		fast = 4
+
+	The pointers meet, so a cycle exists.
+
+	Why Fast Moves 2 Steps and Slow Moves 1 Step
+
+		Think of two runners on a circular track:
+
+			Slow runner: 1 meter per second
+			Fast runner: 2 meters per second
+
+		The fast runner gains 1 meter per second on the slow runner.
+
+		Inside a cycle, the distance between them decreases by one node every iteration. Eventually, the fast pointer "laps" the slow pointer and they meet.
+
+		Mathematical Intuition
+	
+		Let:
+
+			Cycle length = C
+
+		After entering the cycle:
+
+			Relative speed = 2 - 1 = 1 node per iteration
+
+		Each iteration reduces the gap by one node modulo C.
+
+		Since there are only C possible gaps:
+
+			gap, gap-1, gap-2, ..., 0
+
+		they must eventually meet.
+
+		If both moved at the same speed:
+
+			slow = 1 step
+			fast = 1 step
+
+		the distance between them would never change, and they would never meet unless they started together.
+
+		Complexity Analysis
+		Metric	Complexity
+		Time	O(n)
+		Space	O(1)
+		
+		Why O(n)?
+		Each pointer traverses at most a linear number of nodes before either:
+
+			reaching the end (no cycle), or
+			meeting inside the cycle.
+			
+		Why O(1) Space?
+			Only two pointers are used, regardless of the size of the linked list.
+
+		Floyd's Cycle Detection algorithm uses:
+
+			Slow pointer: moves 1 step
+			Fast pointer: moves 2 steps
+
+		The faster pointer gradually catches up to the slower pointer inside a cycle, guaranteeing detection if a cycle exists.
+		The algorithm runs in O(n) time and O(1) space.
+		
+4.Write a function to merge two sorted linked lists into one sorted list. What is the time and space complexity?
+
+	Merge Two Sorted Linked Lists
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def merge_two_lists(list1, list2):
+		dummy = ListNode()
+		current = dummy
+
+		while list1 and list2:
+			if list1.val <= list2.val:
+				current.next = list1
+				list1 = list1.next
+			else:
+				current.next = list2
+				list2 = list2.next
+
+			current = current.next
+
+		# Attach remaining nodes
+		current.next = list1 if list1 else list2
+
+		return dummy.next
+		
+	Example
+	Given:
+
+		List1: 1 → 3 → 5
+		List2: 2 → 4 → 6
+
+	Process:
+
+		Compare 1 and 2 → take 1
+		Result: 1
+
+		Compare 3 and 2 → take 2
+		Result: 1 → 2
+
+		Compare 3 and 4 → take 3
+		Result: 1 → 2 → 3
+
+		Compare 5 and 4 → take 4
+		Result: 1 → 2 → 3 → 4
+
+		Compare 5 and 6 → take 5
+		Result: 1 → 2 → 3 → 4 → 5
+
+		Attach remaining node 6
+		Result: 1 → 2 → 3 → 4 → 5 → 6
+		
+	Helper Function to Print
+	def print_list(head):
+		while head:
+			print(head.val, end=" -> " if head.next else "\n")
+			head = head.next
+			
+	Complexity Analysis
+
+	Let:
+
+		m = length of first list
+		n = length of second list
+		
+	Time Complexity: O(m + n)
+		Each node from both lists is visited exactly once.
+		Total operations are proportional to the total number of nodes.
+	Space Complexity: O(1)
+		No new nodes are created (except the dummy node).
+		The existing nodes are rearranged by changing pointers.
+
+	Algorithm: Iteratively compare the heads of both lists and append the smaller node to the merged list.
+	Time Complexity: O(m + n)
+	Space Complexity: O(1)
+	Result Example:
+		1 → 3 → 5 and 2 → 4 → 6 → 1 → 2 → 3 → 4 → 5 → 6
+		
+5.Given a linked list 1→2→3→4→5, write a function that removes the 2nd node from the end (node 4). Use the two-pointer technique.
+
+	Solution Using Two Pointers
+
+	The idea is to maintain a gap of n nodes between two pointers (fast and slow).
+
+		Move fast ahead by n nodes.
+		Move both fast and slow together until fast reaches the end.
+		slow will be just before the node that needs to be removed.
+		Adjust pointers to skip the target node.
+		
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def remove_nth_from_end(head, n):
+		dummy = ListNode(0, head)
+		fast = slow = dummy
+
+		# Move fast n+1 steps ahead
+		for _ in range(n + 1):
+			fast = fast.next
+
+		# Move both pointers
+		while fast:
+			fast = fast.next
+			slow = slow.next
+
+		# Remove the nth node from the end
+		slow.next = slow.next.next
+
+		return dummy.next
+		
+	Example
+
+	Given:
+
+		1 → 2 → 3 → 4 → 5
+
+	Remove the 2nd node from the end (n = 2).
+
+	Step 1: Move fast 3 steps ahead (n + 1)
+		dummy → 1 → 2 → 3 → 4 → 5
+		slow
+						fast
+					
+	Step 2: Move both pointers together
+		dummy → 1 → 2 → 3 → 4 → 5
+				  slow           fast
+		dummy → 1 → 2 → 3 → 4 → 5
+					   slow        fast=None
+
+	Now slow is at node 3, just before node 4.
+
+	Step 3: Remove node 4
+		slow.next = slow.next.next
+
+	Result:
+		1 → 2 → 3 → 5
+		
+	Test
+		# Create list: 1 -> 2 -> 3 -> 4 -> 5
+		head = ListNode(1)
+		head.next = ListNode(2)
+		head.next.next = ListNode(3)
+		head.next.next.next = ListNode(4)
+		head.next.next.next.next = ListNode(5)
+
+		head = remove_nth_from_end(head, 2)
+
+		# Print result
+		curr = head
+		while curr:
+			print(curr.val, end=" -> " if curr.next else "\n")
+			curr = curr.next
+
+	Output:
+
+	1 -> 2 -> 3 -> 5
+	
+	Complexity Analysis
+		Time Complexity: O(n)
+			Only one traversal of the list is needed.
+		Space Complexity: O(1)
+			Uses only a few pointers regardless of list size.
+
+	Answer
+	For the linked list:
+
+		1 → 2 → 3 → 4 → 5
+
+	Removing the 2nd node from the end results in:
+
+		1 → 2 → 3 → 5
+
+	using the two-pointer technique in O(n) time and O(1) space.
+	
+6.Compare arrays vs linked lists: When would you choose a linked list over a Python list? Give specific scenarios.
+
+	Arrays (Python Lists) vs Linked Lists
+	Operation	Python List (Dynamic Array)	Linked List
+	Access by index	O(1)	O(n)
+	Search	O(n)	O(n)
+	Insert at beginning	O(n)	O(1)
+	Delete at beginning	O(n)	O(1)
+	Insert/Delete in middle (known node)	O(n)	O(1)
+	Append at end	O(1) amortized	O(1) (with tail pointer)
+	Memory usage	Lower	Higher (extra pointer per node)
+	Cache performance	Better	Worse
+	
+	When to Choose a Linked List
+	1. Frequent Insertions and Deletions
+
+		If elements are constantly added or removed from the beginning or middle of a collection.
+
+		Example: Music Playlist Editor
+
+			Song A → Song B → Song C
+
+		Inserting a song between B and C:
+
+			Song A → Song B → New Song → Song C
+
+		With a linked list, only pointers need to be updated (O(1) once the position is known).
+		With a Python list, many elements may need to be shifted (O(n)).
+
+	2. Implementing Queues or Stacks with Heavy Front Operations
+
+		Example: Print Job Queue
+
+			Job1 → Job2 → Job3
+
+		Removing the first job:
+
+			Linked List: O(1)
+			Python List (pop(0)): O(n)
+
+		This is why queue implementations often use linked structures (or Python's deque).
+
+	3. Unknown or Continuously Growing Data
+
+		Example: Browser History
+			Page1 → Page2 → Page3 → ...
+		New pages can be added dynamically without reallocating a large contiguous memory block.
+
+	When to Choose a Python List
+	Most of the time in Python.
+
+	Example 1: Frequent Index Access
+		nums = [10, 20, 30, 40]
+		print(nums[2])  # O(1)
+
+	Linked list access would require traversing nodes:
+		Head → 10 → 20 → 30
+	which is O(n).
+	
+7.Write a function that detects the node where a cycle begins in a linked list (not just whether a cycle exists). Explain the math behind it.
+
+	Detect the Node Where a Cycle Begins
+	This is an extension of Floyd's Cycle Detection Algorithm (Tortoise and Hare).
+
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def detect_cycle_start(head):
+		slow = fast = head
+
+		# Step 1: Detect if a cycle exists
+		while fast and fast.next:
+			slow = slow.next
+			fast = fast.next.next
+
+			if slow == fast:
+				break
+		else:
+			return None  # No cycle
+
+		# Step 2: Find the cycle start
+		slow = head
+
+		while slow != fast:
+			slow = slow.next
+			fast = fast.next
+
+		return slow
+		
+	Example
+	Consider:
+
+	1 → 2 → 3 → 4 → 5
+			  ↑     ↓
+			  ← ← ←
+
+	The cycle begins at node 3.
+
+		# Create nodes
+		n1 = ListNode(1)
+		n2 = ListNode(2)
+		n3 = ListNode(3)
+		n4 = ListNode(4)
+		n5 = ListNode(5)
+
+		# Connect nodes
+		n1.next = n2
+		n2.next = n3
+		n3.next = n4
+		n4.next = n5
+		n5.next = n3  # Cycle starts at node 3
+
+		cycle_start = detect_cycle_start(n1)
+		print(cycle_start.val)  # 3
+		
+	Why Does This Work? (The Math)
+	Let's define:
+
+		L = distance from head to cycle start
+		C = length of the cycle
+		x = distance from cycle start to meeting point
+
+	When the pointers meet:
+		Slow pointer distance
+			slow = L + x
+			
+		Fast pointer distance
+			fast = L + x + kC
+
+	for some integer k because the fast pointer may have completed extra loops around the cycle.
+	Since the fast pointer moves twice as fast:
+
+		fast = 2 × slow
+
+	Substitute:
+
+		L + x + kC = 2(L + x)
+
+	Simplify:
+
+		kC = L + x
+
+	Rearrange:
+
+		L = kC - x
+
+	which is equivalent to:
+
+		L = (C - x) + (k - 1)C
+		
+	Interpretation
+		C - x is the distance from the meeting point to the cycle start.
+		(k - 1)C is one or more complete loops around the cycle.
+
+	Therefore:
+
+		Distance(head → cycle start)
+		=
+		Distance(meeting point → cycle start)
+		
+	The Key Insight
+
+	After the first meeting:
+
+		Place one pointer at the head.
+		Leave the other pointer at the meeting point.
+		Move both one step at a time.
+
+	They will meet exactly at the cycle start.
+
+		Head
+		 ↓
+		1 → 2 → 3 → 4 → 5
+				  ↑     ↓
+				  ← ← ←
+
+		Meeting Point = 5
+
+		Pointer A starts at 1
+		Pointer B starts at 5
+
+		A: 1 → 2 → 3
+		B: 5 → 3
+
+		Meet at node 3
+		
+	Complexity Analysis
+	Metric	Complexity
+	Time Complexity	O(n)
+	Space Complexity	O(1)
+	
+	Why O(n)?
+		Detecting the cycle takes at most O(n).
+		Finding the cycle start takes at most O(n).
+		Total remains O(n).
+		
+	Why O(1) Space?
+		Only a few pointers are used.
+		No hash sets or extra data structures.
+
+	To find the node where a cycle begins:
+
+		Use Floyd's algorithm to find a meeting point inside the cycle.
+		Move one pointer to the head.
+		Move both pointers one step at a time.
+		Their next meeting point is the start of the cycle.
+
+	Time Complexity: O(n)
+	Space Complexity: O(1).
+	
+8.Implement a function that checks if a linked list is a palindrome using O(n) time and O(1) extra space. Hint: reverse the second half.
+
+	Solution: Reverse the Second Half
+	The idea is:
+
+		Find the middle of the linked list using slow/fast pointers.
+		Reverse the second half of the list.
+		Compare the first half and the reversed second half.
+		If all corresponding values match, the list is a palindrome.
+		
+	class ListNode:
+		def __init__(self, val=0, next=None):
+			self.val = val
+			self.next = next
+
+	def is_palindrome(head):
+		if not head or not head.next:
+			return True
+
+		# Step 1: Find middle
+		slow = fast = head
+		while fast and fast.next:
+			slow = slow.next
+			fast = fast.next.next
+
+		# Step 2: Reverse second half
+		prev = None
+		curr = slow
+
+		while curr:
+			nxt = curr.next
+			curr.next = prev
+			prev = curr
+			curr = nxt
+
+		# prev is head of reversed second half
+		second = prev
+		first = head
+
+		# Step 3: Compare halves
+		while second:
+			if first.val != second.val:
+				return False
+
+			first = first.next
+			second = second.next
+
+		return True
+		
+	Example 1
+		1 → 2 → 2 → 1
+		
+	Find Middle
+		slow = third node (2)
+		
+	Reverse Second Half
+		Original second half:
+			2 → 1
+
+		Reversed:
+			1 → 2
+	Compare
+		First Half:   1 → 2
+		Second Half:  1 → 2
+		Match ✓
+
+	Result:
+		True
+		
+	Example 2
+		1 → 2 → 3 → 2 → 1
+		
+	Find Middle
+		slow = 3
+		
+	Reverse Second Half
+		2 → 1
+		becomes
+		1 → 2
+		
+	Compare
+		1 == 1
+		2 == 2
+
+	Result:
+		True
+		
+	Example 3
+		1 → 2 → 3
+		
+	Reverse Second Half
+		2 → 3
+		becomes
+		3 → 2
+	Compare
+		1 != 3 ✗
+
+	Result:
+		False
+		
+	Complexity Analysis
+		Metric	Complexity
+		Time Complexity	O(n)
+		Space Complexity	O(1)
+		
+	Why O(n)?
+		Find middle: O(n)
+		Reverse second half: O(n)
+		Compare halves: O(n)
+
+	Total:
+		O(n) + O(n) + O(n) = O(n)
+		
+	Why O(1) Space?
+	Only a few pointers are used:
+
+		slow, fast, prev, curr, first, second
+
+	No extra arrays, stacks, or hash tables are created.
+
+	Use the slow/fast pointer technique to find the middle, reverse the second half in-place, and compare the two halves.
+
+	Time Complexity: O(n)
+	Space Complexity: O(1).
