@@ -1,0 +1,525 @@
+1.Implement a hash table from scratch with put, get, delete, and resize methods. Use separate chaining for collision handling. Test with 20+ entries.
+
+	class HashTable:
+		def __init__(self, size=10):
+			self.size = size
+			self.count = 0
+			self.table = [[] for _ in range(size)]
+
+		def _hash(self, key):
+			return hash(key) % self.size
+
+		def _load_factor(self):
+			return self.count / self.size
+
+		def put(self, key, value):
+			idx = self._hash(key)
+
+			# Update existing key
+			for pair in self.table[idx]:
+				if pair[0] == key:
+					pair[1] = value
+					return
+
+			# Insert new key-value pair
+			self.table[idx].append([key, value])
+			self.count += 1
+
+			# Resize if load factor > 0.75
+			if self._load_factor() > 0.75:
+				self.resize()
+
+		def get(self, key):
+			idx = self._hash(key)
+
+			for pair in self.table[idx]:
+				if pair[0] == key:
+					return pair[1]
+
+			return None
+
+		def delete(self, key):
+			idx = self._hash(key)
+
+			for i, pair in enumerate(self.table[idx]):
+				if pair[0] == key:
+					del self.table[idx][i]
+					self.count -= 1
+					return True
+
+			return False
+
+		def resize(self):
+			old_table = self.table
+
+			self.size *= 2
+			self.table = [[] for _ in range(self.size)]
+			old_count = self.count
+			self.count = 0
+
+			for bucket in old_table:
+				for key, value in bucket:
+					self.put(key, value)
+
+			self.count = old_count
+
+		def display(self):
+			for i, bucket in enumerate(self.table):
+				print(f"{i}: {bucket}")
+				
+	Testing with 20+ Entries
+	ht = HashTable()
+
+	# Insert 25 entries
+	for i in range(25):
+		ht.put(f"key{i}", i * 100)
+
+	print("Current Size:", ht.size)
+	print("Total Entries:", ht.count)
+
+	# Retrieve values
+	print("\nGet Operations:")
+	print("key0  ->", ht.get("key0"))
+	print("key10 ->", ht.get("key10"))
+	print("key24 ->", ht.get("key24"))
+
+	# Update existing key
+	ht.put("key10", 9999)
+	print("\nUpdated key10 ->", ht.get("key10"))
+
+	# Delete keys
+	print("\nDelete Operations:")
+	print("Delete key5:", ht.delete("key5"))
+	print("Delete key15:", ht.delete("key15"))
+	print("Delete key50:", ht.delete("key50"))  # Not found
+
+	# Verify deletion
+	print("\nAfter Deletion:")
+	print("key5  ->", ht.get("key5"))
+	print("key15 ->", ht.get("key15"))
+
+	print("\nCurrent Size:", ht.size)
+	print("Total Entries:", ht.count)
+
+	# Display buckets
+	print("\nHash Table:")
+	ht.display()
+	
+	Sample Output:
+	Current Size: 40
+	Total Entries: 25
+
+	Get Operations:
+	key0  -> 0
+	key10 -> 1000
+	key24 -> 2400
+
+	Updated key10 -> 9999
+
+	Delete Operations:
+	Delete key5: True
+	Delete key15: True
+	Delete key50: False
+
+	After Deletion:
+	key5  -> None
+	key15 -> None
+
+	Current Size: 40
+	Total Entries: 23
+	
+2.Explain what happens during a hash collision. Compare separate chaining vs open addressing (linear probing). Which does Python's dict use?
+
+	Separate Chaining (Hash Table with Collision Handling)
+	class HashTableSeparateChaining:
+		def __init__(self, size=10):
+			self.size = size
+			self.table = [[] for _ in range(size)]
+
+		def _hash(self, key):
+			return hash(key) % self.size
+
+		def put(self, key, value):
+			idx = self._hash(key)
+
+			for pair in self.table[idx]:
+				if pair[0] == key:
+					pair[1] = value
+					return
+
+			self.table[idx].append([key, value])
+
+		def get(self, key):
+			idx = self._hash(key)
+
+			for k, v in self.table[idx]:
+				if k == key:
+					return v
+
+			return None
+
+		def delete(self, key):
+			idx = self._hash(key)
+
+			for i, (k, v) in enumerate(self.table[idx]):
+				if k == key:
+					del self.table[idx][i]
+					return True
+
+			return False
+
+		def display(self):
+			for i, bucket in enumerate(self.table):
+				print(f"{i}: {bucket}")
+
+
+	# Example
+	ht = HashTableSeparateChaining(5)
+
+	ht.put("apple", 100)
+	ht.put("banana", 200)
+	ht.put("orange", 300)
+
+	print(ht.get("banana"))
+
+	ht.delete("banana")
+	print(ht.get("banana"))
+
+	ht.display()
+	
+	Open Addressing (Linear Probing)
+	class HashTableLinearProbing:
+		def __init__(self, size=10):
+			self.size = size
+			self.table = [None] * size
+
+		def _hash(self, key):
+			return hash(key) % self.size
+
+		def put(self, key, value):
+			idx = self._hash(key)
+
+			for _ in range(self.size):
+				if self.table[idx] is None or self.table[idx][0] == key:
+					self.table[idx] = (key, value)
+					return
+
+				idx = (idx + 1) % self.size
+
+			raise Exception("Hash Table Full")
+
+		def get(self, key):
+			idx = self._hash(key)
+
+			for _ in range(self.size):
+				if self.table[idx] is None:
+					return None
+
+				if self.table[idx][0] == key:
+					return self.table[idx][1]
+
+				idx = (idx + 1) % self.size
+
+			return None
+
+		def delete(self, key):
+			idx = self._hash(key)
+
+			for _ in range(self.size):
+				if self.table[idx] is None:
+					return False
+
+				if self.table[idx][0] == key:
+					self.table[idx] = None
+					return True
+
+				idx = (idx + 1) % self.size
+
+			return False
+
+		def display(self):
+			for i, item in enumerate(self.table):
+				print(f"{i}: {item}")
+
+
+	# Example
+	ht = HashTableLinearProbing(10)
+
+	ht.put("apple", 100)
+	ht.put("banana", 200)
+	ht.put("orange", 300)
+
+	print(ht.get("banana"))
+
+	ht.delete("banana")
+	print(ht.get("banana"))
+
+	ht.display()
+	
+	Output Example:
+	200
+	None
+	
+3.Write a function that groups anagrams together from a list of strings.
+Example: ['eat','tea','tan','ate','nat','bat'] → [['eat','tea','ate'],['tan','nat'],['bat']].
+
+	from collections import defaultdict
+
+	def group_anagrams(strs):
+		groups = defaultdict(list)
+
+		for word in strs:
+			key = ''.join(sorted(word))
+			groups[key].append(word)
+
+		return list(groups.values())
+
+
+	# Example
+	strs = ['eat', 'tea', 'tan', 'ate', 'nat', 'bat']
+
+	result = group_anagrams(strs)
+	print(result)
+	
+	Output:
+	[['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]
+	
+4.Find the longest consecutive sequence in an unsorted array. Example: [100,4,200,1,3,2] → 4 (the sequence 1,2,3,4). Achieve O(n) time complexity.
+
+	def longest_consecutive(nums):
+		if not nums:
+			return 0
+
+		num_set = set(nums)
+		longest = 0
+
+		for num in num_set:
+
+			# Start of a sequence
+			if num - 1 not in num_set:
+
+				current = num
+				length = 1
+
+				while current + 1 in num_set:
+					current += 1
+					length += 1
+
+				longest = max(longest, length)
+
+		return longest
+
+
+	# Example
+	nums = [100, 4, 200, 1, 3, 2]
+	print(longest_consecutive(nums))
+	
+	Output:
+	4
+	
+5.Given an array of integers, return the top k most frequent elements using a bucket sort approach (not heap). Explain why this is O(n).
+
+	from collections import Counter
+
+	def top_k_frequent(nums, k):
+		# Step 1: Count frequencies
+		freq = Counter(nums)
+
+		# Step 2: Create buckets
+		buckets = [[] for _ in range(len(nums) + 1)]
+
+		# Step 3: Place numbers into buckets
+		for num, count in freq.items():
+			buckets[count].append(num)
+
+		# Step 4: Collect top k frequent elements
+		result = []
+
+		for i in range(len(buckets) - 1, 0, -1):
+			for num in buckets[i]:
+				result.append(num)
+
+				if len(result) == k:
+					return result
+
+		return result
+
+
+	# Example
+	nums = [1, 1, 1, 2, 2, 3]
+	k = 2
+
+	print(top_k_frequent(nums, k))
+	
+	Output:
+	[1, 2]
+	
+6.Write a function that finds all pairs in an array that sum to a given target. Handle duplicate pairs. Return unique pairs only.
+
+	def find_pairs(nums, target):
+		seen = set()
+		pairs = set()
+
+		for num in nums:
+			complement = target - num
+
+			if complement in seen:
+				# Store pair in sorted order to avoid duplicates
+				pairs.add(tuple(sorted((num, complement))))
+
+			seen.add(num)
+
+		return [list(pair) for pair in pairs]
+
+
+	# Example
+	nums = [1, 2, 3, 4, 5, 2, 3, 4]
+	target = 6
+
+	print(find_pairs(nums, target))
+	
+	Output:
+	[[1, 5], [2, 4], [3, 3]]
+	
+7.Implement an LRU Cache with O(1) get and put operations. Hint: combine a hash map with a doubly linked list.
+
+	class Node:
+		def __init__(self, key, value):
+			self.key = key
+			self.value = value
+			self.prev = None
+			self.next = None
+
+
+	class LRUCache:
+		def __init__(self, capacity):
+			self.capacity = capacity
+			self.cache = {}
+
+			# Dummy head and tail
+			self.head = Node(0, 0)
+			self.tail = Node(0, 0)
+
+			self.head.next = self.tail
+			self.tail.prev = self.head
+
+		def _remove(self, node):
+			prev_node = node.prev
+			next_node = node.next
+
+			prev_node.next = next_node
+			next_node.prev = prev_node
+
+		def _insert_at_front(self, node):
+			node.next = self.head.next
+			node.prev = self.head
+
+			self.head.next.prev = node
+			self.head.next = node
+
+		def get(self, key):
+			if key not in self.cache:
+				return -1
+
+			node = self.cache[key]
+
+			# Move to front (most recently used)
+			self._remove(node)
+			self._insert_at_front(node)
+
+			return node.value
+
+		def put(self, key, value):
+			if key in self.cache:
+				node = self.cache[key]
+				node.value = value
+
+				self._remove(node)
+				self._insert_at_front(node)
+
+			else:
+				node = Node(key, value)
+
+				self.cache[key] = node
+				self._insert_at_front(node)
+
+				if len(self.cache) > self.capacity:
+					# Remove LRU node
+					lru = self.tail.prev
+
+					self._remove(lru)
+					del self.cache[lru.key]
+					
+	Example:
+	cache = LRUCache(2)
+
+	cache.put(1, 10)
+	cache.put(2, 20)
+
+	print(cache.get(1))   # 10
+
+	cache.put(3, 30)      # Evicts key 2
+
+	print(cache.get(2))   # -1
+
+	cache.put(4, 40)      # Evicts key 1
+
+	print(cache.get(1))   # -1
+	print(cache.get(3))   # 30
+	print(cache.get(4))   # 40
+	
+	Output:
+	10
+	-1
+	-1
+	30
+	40
+	
+8.Given a sudoku board (9×9), write a function to check if it is valid using hash sets for rows, columns, and 3×3 boxes.
+
+	def is_valid_sudoku(board):
+		rows = [set() for _ in range(9)]
+		cols = [set() for _ in range(9)]
+		boxes = [set() for _ in range(9)]
+
+		for r in range(9):
+			for c in range(9):
+				num = board[r][c]
+
+				# Skip empty cells
+				if num == '.':
+					continue
+
+				# Calculate box index
+				box = (r // 3) * 3 + (c // 3)
+
+				# Check for duplicates
+				if (num in rows[r] or
+					num in cols[c] or
+					num in boxes[box]):
+					return False
+
+				rows[r].add(num)
+				cols[c].add(num)
+				boxes[box].add(num)
+
+		return True
+
+
+	# Example
+	board = [
+		["5","3",".",".","7",".",".",".","."],
+		["6",".",".","1","9","5",".",".","."],
+		[".","9","8",".",".",".",".","6","."],
+		["8",".",".",".","6",".",".",".","3"],
+		["4",".",".","8",".","3",".",".","1"],
+		["7",".",".",".","2",".",".",".","6"],
+		[".","6",".",".",".",".","2","8","."],
+		[".",".",".","4","1","9",".",".","5"],
+		[".",".",".",".","8",".",".","7","9"]
+	]
+
+	print(is_valid_sudoku(board))
+	
+	Output:
+	True
