@@ -1,0 +1,362 @@
+1.Implement a MinStack that supports push, pop, top, and getMin, all in O(1) time. Explain your approach.
+
+	A MinStack is a stack that, in addition to normal stack operations, can return the minimum element in O(1) time.
+
+	class MinStack:
+		def __init__(self):
+			self.stack = []
+			self.min_stack = []
+
+		def push(self, val):
+			self.stack.append(val)
+
+			if not self.min_stack:
+				self.min_stack.append(val)
+			else:
+				self.min_stack.append(min(val, self.min_stack[-1]))
+
+		def pop(self):
+			if self.stack:
+				self.min_stack.pop()
+				return self.stack.pop()
+			return None
+
+		def top(self):
+			if self.stack:
+				return self.stack[-1]
+			return None
+
+		def getMin(self):
+			if self.min_stack:
+				return self.min_stack[-1]
+			return None
+		
+	Example Usage
+	ms = MinStack()
+
+	ms.push(5)
+	ms.push(2)
+	ms.push(8)
+	ms.push(1)
+
+	print(ms.getMin())  # 1
+
+	ms.pop()
+
+	print(ms.top())     # 8
+	print(ms.getMin())  # 2
+	
+	Output:
+	1
+	8
+	2
+	
+2.Write a function that evaluates a postfix expression (Reverse Polish Notation).
+
+	A postfix expression (Reverse Polish Notation - RPN) is evaluated using a stack.
+
+	Algorithm
+		Traverse the tokens from left to right.
+		If the token is a number, push it onto the stack.
+		If the token is an operator (+, -, *, /):
+			Pop the top two operands.
+			Apply the operator.
+			Push the result back onto the stack.
+		After processing all tokens, the stack's top element is the result.
+	
+	def eval_postfix(tokens):
+		stack = []
+
+		for token in tokens:
+			if token in {'+', '-', '*', '/'}:
+				b = stack.pop()
+				a = stack.pop()
+
+				if token == '+':
+					stack.append(a + b)
+				elif token == '-':
+					stack.append(a - b)
+				elif token == '*':
+					stack.append(a * b)
+				elif token == '/':
+					stack.append(int(a / b))  # truncate toward zero
+			else:
+				stack.append(int(token))
+
+		return stack.pop()
+		
+	Example 1
+		tokens = ['2', '1', '+', '3', '*']
+		print(eval_postfix(tokens))
+	
+	Evaluation:
+		2 1 +  -> 3
+		3 3 *  -> 9
+		
+	Output:
+		9
+		
+3.Implement a Queue using two Stacks only. Explain the amortized time complexity of the dequeue operation.
+
+	A Queue follows FIFO (First In, First Out), while a Stack follows LIFO (Last In, First Out).
+
+	We can implement a Queue using two stacks:
+
+		stack_in: Used for enqueue operations.
+		stack_out: Used for dequeue operations.
+		
+	Idea
+	
+	Enqueue(x)
+	Push the element into stack_in.
+	
+	Dequeue()
+		If stack_out is not empty, pop from it.
+		Otherwise:
+			Move all elements from stack_in to stack_out.
+			Pop from stack_out.
+			
+		This reversal makes the oldest element appear on top of stack_out.
+		
+	Python Implementation
+	
+	class QueueUsingStacks:
+		def __init__(self):
+			self.stack_in = []
+			self.stack_out = []
+
+		def enqueue(self, item):
+			self.stack_in.append(item)
+
+		def dequeue(self):
+			if not self.stack_out:
+				while self.stack_in:
+					self.stack_out.append(self.stack_in.pop())
+
+			if not self.stack_out:
+				return None
+
+			return self.stack_out.pop()
+
+		def front(self):
+			if not self.stack_out:
+				while self.stack_in:
+					self.stack_out.append(self.stack_in.pop())
+
+			return self.stack_out[-1] if self.stack_out else None
+
+		def is_empty(self):
+			return not self.stack_in and not self.stack_out
+			
+	Example
+		q = QueueUsingStacks()
+
+		q.enqueue(10)
+		q.enqueue(20)
+		q.enqueue(30)
+
+		print(q.dequeue())  # 10
+		print(q.dequeue())  # 20
+
+		q.enqueue(40)
+
+		print(q.dequeue())  # 30
+		print(q.dequeue())  # 40
+		
+	Output:
+		10
+		20
+		30
+		40
+		
+4.Given an array of daily temperatures [73,74,75,71,69,72,76,73],
+return an array where each element tells how many days until a warmer temperature. Use a stack.
+
+	def daily_temperatures(temperatures):
+		n = len(temperatures)
+		result = [0] * n
+		stack = []  # stores indices
+
+		for i in range(n):
+			while stack and temperatures[i] > temperatures[stack[-1]]:
+				prev_index = stack.pop()
+				result[prev_index] = i - prev_index
+
+			stack.append(i)
+
+		return result
+
+
+	# Example
+	temperatures = [73, 74, 75, 71, 69, 72, 76, 73]
+	print(daily_temperatures(temperatures))
+	
+	Output:
+	[1, 1, 4, 2, 1, 1, 0, 0]
+	
+5.Write a function that uses a stack to convert an infix expression like '3 + 4 * 2' to postfix '3 4 2 * +'.
+
+	def infix_to_postfix(expression):
+		precedence = {
+			'+': 1,
+			'-': 1,
+			'*': 2,
+			'/': 2,
+			'^': 3
+		}
+
+		stack = []
+		postfix = []
+
+		tokens = expression.split()
+
+		for token in tokens:
+			# Operand
+			if token.isalnum():
+				postfix.append(token)
+
+			# Left parenthesis
+			elif token == '(':
+				stack.append(token)
+
+			# Right parenthesis
+			elif token == ')':
+				while stack and stack[-1] != '(':
+					postfix.append(stack.pop())
+				stack.pop()  # Remove '('
+
+			# Operator
+			else:
+				while (stack and stack[-1] != '(' and
+					   precedence.get(stack[-1], 0) >= precedence[token]):
+					postfix.append(stack.pop())
+
+				stack.append(token)
+
+		# Pop remaining operators
+		while stack:
+			postfix.append(stack.pop())
+
+		return ' '.join(postfix)
+
+
+	# Example
+	expr = "3 + 4 * 2"
+	print(infix_to_postfix(expr))
+	
+	Output:
+	3 4 2 * +
+	
+	Example with Parentheses:
+	expr = "( 3 + 4 ) * 2"
+	print(infix_to_postfix(expr))
+	
+	Output:
+	3 4 + 2 *
+	
+6.Explain the difference between LIFO and FIFO with real-world examples. When would you choose a stack over a queue?
+
+	Last In, First Out:
+	stack = []
+
+	# Visit pages
+	stack.append("Google")
+	stack.append("YouTube")
+	stack.append("GitHub")
+
+	# Back button
+	print(stack.pop())  # GitHub
+	print(stack.pop())  # YouTube
+	
+	First In, First Out:
+	from collections import deque
+
+	queue = deque()
+
+	# People join the queue
+	queue.append("Alice")
+	queue.append("Bob")
+	queue.append("Charlie")
+
+	# Serve people
+	print(queue.popleft())  # Alice
+	print(queue.popleft())  # Bob
+	
+7.Implement a function that checks if a sequence of push/pop operations on a stack is valid.
+Given pushed=[1,2,3,4,5] and popped=[4,5,3,2,1], return True.
+
+	def validate_stack_sequences(pushed, popped):
+		stack = []
+		pop_index = 0
+
+		for num in pushed:
+			stack.append(num)
+
+			while stack and pop_index < len(popped) and stack[-1] == popped[pop_index]:
+				stack.pop()
+				pop_index += 1
+
+		return len(stack) == 0
+
+
+	# Example
+	pushed = [1, 2, 3, 4, 5]
+	popped = [4, 5, 3, 2, 1]
+
+	print(validate_stack_sequences(pushed, popped))
+	
+	Output:
+	True
+	
+8.Design a MaxStack that supports push, pop, top, peekMax, and popMax. What tradeoffs do you encounter?
+
+	class MaxStack:
+		def __init__(self):
+			self.stack = []
+			self.max_stack = []
+
+		def push(self, x):
+			self.stack.append(x)
+
+			if not self.max_stack:
+				self.max_stack.append(x)
+			else:
+				self.max_stack.append(max(x, self.max_stack[-1]))
+
+		def pop(self):
+			self.max_stack.pop()
+			return self.stack.pop()
+
+		def top(self):
+			return self.stack[-1]
+
+		def peekMax(self):
+			return self.max_stack[-1]
+
+		def popMax(self):
+			max_val = self.peekMax()
+
+			buffer = []
+
+			while self.top() != max_val:
+				buffer.append(self.pop())
+
+			self.pop()  # remove max value
+
+			while buffer:
+				self.push(buffer.pop())
+
+			return max_val
+			
+	ms = MaxStack()
+
+	ms.push(5)
+	ms.push(1)
+	ms.push(5)
+
+	print(ms.top())      # 5
+	print(ms.popMax())   # 5
+	print(ms.peekMax())  # 5
+	print(ms.pop())      # 1
+	print(ms.top())      # 5
+	
